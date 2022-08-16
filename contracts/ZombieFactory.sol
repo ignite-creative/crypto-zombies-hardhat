@@ -1,15 +1,21 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
+import "./Ownable.sol";
+
 contract ZombieFactory {
-    uint256 dnaDigits = 16;
+    uint8 dnaDigits = 16;
     uint256 dnaModulus = 10**dnaDigits;
+    uint256 cooldownTime = 1 days;
+
 
     event NewZombie(uint256 zombieId, string name, uint256 dna);
 
     struct Zombie {
         string name;
         uint256 dna;
+        uint32 level;
+        uint32 readyTime;
     }
 
     Zombie[] public zombies;
@@ -18,7 +24,7 @@ contract ZombieFactory {
     mapping (address => uint256) ownerZombieCount;
 
     function _createZombie(string memory _name, uint256 _dna) internal {
-        zombies.push(Zombie(_name, _dna));
+        zombies.push(Zombie(_name, _dna, 1, uint32(block.timestamp + cooldownTime)));
         uint256 id = zombies.length - 1;
 
         zombieToOwner[id] = msg.sender;
