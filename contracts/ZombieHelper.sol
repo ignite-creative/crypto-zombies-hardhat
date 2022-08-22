@@ -3,10 +3,26 @@ pragma solidity ^0.8.9;
 
 import "./ZombieFeeding.sol";
 
-contract ZombieHelper is ZombieFeeding {
+contract ZombieHelper is ZombieFeeding, Ownable {
+    uint256 levelUpFee = 0.001 ether;
+
     modifier aboveLevel(uint32 _level, uint256 _zombieId) {
         require(zombies[_zombieId].level >= _level);
         _;
+    }
+
+    function withdraw() external onlyOwner {
+        address payable _owner = payable(address(uint160(owner())));
+        _owner.transfer(address(this).balance);
+    }
+
+    function setLevelUpFee(uint256 _fee) external onlyOwner {
+        levelUpFee = _fee;
+    }
+
+    function levelUp(uint256 _zombieId) external payable {
+        require(msg.value == levelUpFee);
+        zombies[_zombieId].level++;
     }
 
     function changeName(uint256 _zombieId, string memory _newName)
