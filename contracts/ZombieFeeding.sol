@@ -26,6 +26,11 @@ contract ZombieFeeding is ZombieFactory {
 
     KittyInterface kittyContract; // = KittyInterface(ckAddress);
 
+    modifier ownerOf(uint256 _zombieId) {
+      require(msg.sender == zombieToOwner[_zombieId]);
+      _;
+    }
+
     function setKittyContractAddress(address _address) external {
         kittyContract = KittyInterface(_address);
     }
@@ -42,8 +47,8 @@ contract ZombieFeeding is ZombieFactory {
         uint256 _zombieId,
         uint256 _targetDna,
         string memory _species
-    ) internal {
-        require(msg.sender == zombieToOwner[_zombieId]);
+    ) internal ownerOf(_zombieId) {
+        // require(msg.sender == zombieToOwner[_zombieId]);
 
         Zombie storage myZombie = zombies[_zombieId];
 
